@@ -1,0 +1,16 @@
+# Ignore all latex intemediary files
+*.aux
+*.fls
+*.log
+*.out
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.synctex(busy)
+*.synctex
+*.synctex.gz(busy)
+*.synctex.gz
