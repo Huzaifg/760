@@ -22,6 +22,3 @@ print(rootnode.children)
 plt.scatter(D[:, 0], D[:, 1], c=D[:, 2])
 plt.savefig('./images/2.png')
 plt.show()
-
-
-
