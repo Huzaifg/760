@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from knn import NearestNeighborClassifier
 from logisticRegression import LogisticRegressionClassifier
+from sklearn import metrics
 
 
 def generate_roc_points(y_true, y_scores):
@@ -57,19 +58,27 @@ if __name__ == '__main__':
     y_probs_knn = clf.predict_proba()
 
     # Train with Logistic Regression and test
-    # clf = LogisticRegressionClassifier()
-    # clf.fit(train_data.iloc[:, 0:num_cols].values,
-    #         train_data.iloc[:, num_cols].values, lr=0.01, epochs=1000)
-    # y_pred_lr = clf.predict(test_data.iloc[:, 0:num_cols].values)
-    # y_probs_lr = clf.predict_proba()
+    clf = LogisticRegressionClassifier()
+    clf.fit(train_data.iloc[:, 0:num_cols].values,
+            train_data.iloc[:, num_cols].values, lr=0.00001, epochs=10000)
+    y_pred_lr = clf.predict(test_data.iloc[:, 0:num_cols].values)
+    y_probs_lr = clf.predict_proba()
 
-    roc_curve = generate_roc_points(
-        test_data.iloc[:, num_cols].values, y_probs_knn)
-
+    fpr_lr, tpr_lr, thresholds = metrics.roc_curve(
+        test_data.iloc[:, num_cols].values, y_probs_lr, pos_label=1)
+    lr_area = metrics.auc(fpr_lr, tpr_lr)
+    fpr, tpr, thresholds = metrics.roc_curve(
+        test_data.iloc[:, num_cols].values, y_probs_knn, pos_label=1)
+    knn_area = metrics.auc(fpr, tpr)
     # Plot ROC curve
     plt.figure()
-    plt.plot([x[0] for x in roc_curve], [x[1] for x in roc_curve])
+    # plt.plot([x[0] for x in roc_curve], [x[1] for x in roc_curve])
+    plt.plot(fpr, tpr, label=f"KNN with K = 5 (area = {knn_area.round(2)})")
+    plt.plot(fpr_lr, tpr_lr,
+             label=f"Logistic Regression (area = {lr_area.round(2)})")
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.title('ROC Curve')
+    plt.legend(loc="lower right")
+    plt.savefig('./images/roc_curve.png')
     plt.show()

@@ -79,5 +79,8 @@ if __name__ == '__main__':
 
     # Plot the accuracies, precisions and recalls
     plt.plot(k_arr, avg_accuracies, label='Accuracy')
+    plt.xlabel('k')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy vs k')
     plt.savefig('./images/2_4.png')
     plt.show()
