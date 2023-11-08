@@ -177,8 +177,8 @@
 %%% NOTE:  Replace 'NAME HERE' etc., and delete any "\red{}" wrappers (so it won't show up as red)
 
 \author{
-\red{$>>$NAME HERE$<<$} \\
-\red{$>>$ID HERE$<<$}\\
+\red{$>>$Huzaifa Mustafa Unjhawala$<<$} \\
+\red{$>>$GITHUB LINK - https://github.com/Huzaifg/760.git$<<$}\\
 }
 
 \date{}
@@ -303,6 +303,21 @@ K-means, means for GMMs) and map them to the distribution with the closest mean.
 Points break down: 7 points each for implementation of each method, 6 points for reporting of
 evaluation metrics.
 
+\textbf{Solution: }\\
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{../images/1_2_clustering_obj.png}
+    \caption{Clustering Objective}
+    \label{fig:obj}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{../images/1_2_clustering_acc.png}
+    \caption{Clustering Accuracy}
+    \label{fig:acc}
+\end{figure}
 
 \section{Linear Dimensionality Reduction}
 
@@ -322,6 +337,47 @@ $\tilde{x}_i = x_i - A_kA_k^\top x_i$. We wish to find $a_{k+1}$, to maximize
 $\frac{1}{n} \sum_i (a_{k+1}^\top \tilde{x}_i)^2$. Show that $a_{k+1}$ is the
 $(k+1)^{th}$ right singular vector of $X$.
 
+
+\end{enumerate}
+
+\textbf{Solution: }\\
+
+\begin{enumerate}
+    \item We can write the objective function as:
+    \begin{align*}
+        \frac{1}{n} \sum_i (a_1^\top x_i)^2 &= \frac{1}{n} \sum_i (a_1^\top x_i)(x_i^\top a_1)\\
+        &= \frac{1}{n} \sum_i a_1^\top x_i x_i^\top a_1\\
+        &= a_1^\top \left(\frac{1}{n} \sum_i x_i x_i^\top \right) a_1\\
+        &= a_1^\top \left(\frac{1}{n} X^\top X \right) a_1
+    \end{align*}
+    We would like to maximize this subject to the constraint that $a_1^Ta_1 = 1$. Thus we can write the Lagrangian as:
+    \begin{align*}
+        \mathcal{L}(a_1, \lambda) &= a_1^\top \left(\frac{1}{n} X^\top X \right) a_1 - \lambda(a_1^Ta_1 - 1)\\
+        \frac{\partial \mathcal{L}}{\partial a_1} &= \frac{2}{n} X^\top X a_1 - 2\lambda a_1 = 0\\
+        \implies X^\top X a_1 &= \lambda a_1
+    \end{align*}
+    Thus, $a_1$ is the first right singular vector of $X$ as the last line is the definition of the right singular vector.
+
+    \item Note that $\tilde{X} = X - A_kA_k^TX$. Then, using a similar approach, we can write the objective function as:
+    \begin{align*}
+        \frac{1}{n} \sum_i (a_{k+1}^\top \tilde{x}_i)^2 &= \frac{1}{n} \sum_i (a_{k+1}^\top \tilde{x}_i)(\tilde{x}_i^\top a_{k+1})\\
+        &= \frac{1}{n} \sum_i a_{k+1}^\top \tilde{x}_i \tilde{x}_i^\top a_{k+1}\\
+        &= a_{k+1}^\top \left(\frac{1}{n} \sum_i \tilde{x}_i \tilde{x}_i^\top \right) a_{k+1}\\
+        &= a_{k+1}^\top \left(\frac{1}{n} \tilde{X}^\top \tilde{X} \right) a_{k+1} \\
+    \end{align*}
+    We would like to maximize this subject to the constraint that $a_{k+1}^Ta_{k+1} = 1$. Thus we can write the Lagrangian as:
+    \begin{align*}
+        \mathcal{L}(a_{k+1}, \lambda) &= a_{k+1}^\top \left(\frac{1}{n} \tilde{X}^\top \tilde{X} \right) a_{k+1} - \lambda(a_{k+1}^Ta_{k+1} - 1)\\
+        \frac{\partial \mathcal{L}}{\partial a_{k+1}} &= \frac{2}{n} \tilde{X}^\top \tilde{X} a_{k+1} - 2\lambda a_{k+1} = 0\\
+        \implies \tilde{X}^\top \tilde{X} a_{k+1} &= \lambda a_{k+1}
+    \end{align*}
+    Now note that $\tilde{X} = (\mathbb{I} - A_kA_k^T)X$. Let $(\mathbb{I} - A_kA_k^T) = E$, thus $\tilde{X} = EX$. Using this in the above equations:
+    \begin{align*}
+        \tilde{X}^\top \tilde{X} a_{k+1} &= \lambda a_{k+1}\\
+        \implies X^\top E^\top E X a_{k+1} &= \lambda a_{k+1}\\
+        \implies X^\top X a_{k+1} &= \lambda a_{k+1}
+    \end{align*}
+    Thus, $a_{k+1}$ is the $(k+1)^{th}$ right singular vector of $X$ as the last line is the definition of the right singular vector.
 
 \end{enumerate}
 
@@ -391,7 +447,58 @@ $d$--dimensional representation $z_i$.)
 
 \end{enumerate}
 
+\textbf{Solution: }
+\begin{enumerate}
+    \item We can write the objective function as:
+    \begin{align*}
+        J(A_2, b_2, Z_2) &= \| X - Z_2A_2^\top - \one b_2^\top\|_F^2\\
+        &= \| X - (Z_1 M^\top + \one p^\top)A_1^\top - \one (b_1- A_1M^{-1}p)^\top\|_F^2\\
+        &= \| X - Z_1M^\top A_1^\top - \one b_1^\top + \one A_1M^{-1}p^\top\|_F^2\\
+        &= \| X - Z_1A_1^\top - \one b_1^\top\|_F^2\\
+        &= J(A_1, b_1, Z_1)
+    \end{align*}
+    Thus, both $(A_1, b_1, Z_1)$ and $(A_2, b_2, Z_2)$ achieve the same objective value $J$~\eqref{eqn:dimobj}.
 
+    \item There are multiple ways to solve this problem. One way would be to optimize the objective function with respect to $A, b, Z$ and then project $Z$ onto the subspace spanned by the first $d$ singular vectors of $Z$. We could add the constraints stated above to this optimization problem and solve using standard optimization algorithms like L-BFGS.\\
+    The other way would be to optimize the objection function for $b$. This means taking the gradient of the objective function with respect to $b$ and setting it to zero. This gives us:
+    \begin{align*}
+        \frac{\partial}{\partial b} \left( \frac{1}{n} \sum_{i=1}^n \|x_i - Az_i - b\|^2 \right) &= 0 \\
+        \implies \frac{1}{n} \sum_{i=1}^n -2(x_i - Az_i - b) &= 0\\
+    \end{align*}
+    Now, we know that $\frac{1}{n} \sum_{i=1}^n z_i = 0$, because $z_i$ is zero mean. Thus, we can write the above equation as:
+    \begin{align*}
+        \frac{1}{n} \sum_{i=1}^n -2(x_i - Az_i - b) &= 0\\
+        \implies \frac{1}{n} \sum_{i=1}^n -2(x_i - Az_i) - 2b &= 0\\
+        \implies \frac{1}{n} \sum_{i=1}^n -2(x_i - Az_i) &= 2b\\
+        \implies b &= \frac{1}{n} \sum_{i=1}^n (x_i - Az_i) \\
+        \implies b &= \frac{1}{n} \sum_{i=1}^n x_i
+    \end{align*}
+    Now, that we know $b$, we can define $Y = X - b$ to get mean centered data. Then, to minimize our function $\frac{1}{n} \| Y - ZA^\top\|_F^2$. 
+    Taking the derivative of this function with respect to $A$, we get:
+    \begin{align*}
+        \frac{\partial}{\partial A} \left( \frac{1}{n} \| Y - ZA^\top\|_F^2 \right) &= 0 \\
+        \frac{1}{n} \frac{\partial}{\partial A} \left( \sum_{i=1}^n \| y_i - z_iA^\top\|^2 \right) &= 0 \\
+        \frac{1}{n} \sum_{i=1}^n \frac{\partial}{\partial A} \left( \| y_i - z_iA^\top\|^2 \right) &= 0 \\
+        \frac{1}{n} \sum_{i=1}^n \frac{\partial}{\partial A} \left( (y_i - z_iA^\top)^T(y_i - z_iA^\top) \right) &= 0 \\
+        \frac{1}{n} \sum_{i=1}^n \frac{\partial}{\partial A} \left( y_i^Ty_i - y_i^Tz_iA^\top - A(z_i^Ty_i) + A(z_i^Tz_i)A^\top \right) &= 0 \\
+        \frac{1}{n} \sum_{i=1}^n \frac{\partial}{\partial A} \left( y_i^Ty_i - 2y_i^Tz_iA^\top + A(z_i^Tz_i)A^\top \right) &= 0 \\
+        \frac{1}{n} \sum_{i=1}^n \left(-2 y_i^\top z_i + 2z_i^\top z_iA\right) &= 0
+    \end{align*}
+    Now, we can use the identity constraint $Z^\top Z = I_d$ to get:
+    \begin{align*}
+        \frac{1}{n} \sum_{i=1}^n \left(-2 y_i^\top z_i + 2z_i^\top z_iA\right) &= 0\\
+        \implies \frac{1}{n} \sum_{i=1}^n \left(-2 y_i^\top z_i + 2A\right) &= 0\\
+        \implies \frac{1}{n} \sum_{i=1}^n \left(-2 y_i^\top z_i\right) &= -2A\\
+        \implies A &= \frac{1}{n} \sum_{i=1}^n y_i^\top z_i
+    \end{align*}
+    Rearranging and writing this in matrix form, we get $Y = AZ^\top$
+    The rank $d$ approximation of $Y$ is given by $Y = U\Sigma V^\top$. \\
+    Thus, $Z = U_d$ and $A = \Sigma_dV_d^\top$ where $U_d$ and $V_d$ are the first $d$ columns of $U$ and $V$ respectively will give us the best possible $Z$ and $A$.\\
+    In our derivation, we have already assumed that $Z$ has a zero mean and identity covariance and so these constraints are satisfied.\\
+
+    \item First we should subtract $b$, calculated from the training data (just the training data mean) from $x_*$. Let this be $\tilde{x_*}$. Then, we should project $\tilde{x_*}$ onto the subspace spanned by the first $d$ singular vectors of $Z$ to get $z_*$ using $z_* = A^\top \tilde{x_*}$\
+
+\end{enumerate}
 \subsection{Experiment (34 points)}
 
 Here we will compare the above three methods on two data sets. 
@@ -477,16 +584,44 @@ Is this surprising? Why?
 \vspace{0.2in}
 
 \textbf{Answer format:}  \\
-The graph bellow is in example of how a plot of one of the algorithms for the 2D dataset may look like: \\
-% \includegraphics[width=3in]{../images/buggy_pca} \hspace{0.4in}
-\\
+The graph below is what is obtained for the 2D data set when projecting the data onto the first principal component. \\
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.\linewidth]{../images/2_3.png}
+    \caption{Reconstructed points for 2D data set}
+    \label{fig:rec_2d}
+\end{figure}
+The reconstruction loss for the 2D dataset is given as
+\begin{verbatim}
+    Buggy reconstruction error dataset1: 44.34515418673971
+    Demeaned reconstruction error dataset1: 0.5003042814256459
+    Normalized reconstruction error dataset1: 2.473604172738536
+    DRO reconstruction error dataset1: 0.5003042814256461
+\end{verbatim}
 
-The blue circles are from the original dataset and the red crosses are the reconstructed points. \\
 
-And this is how the reconstruction error may look like for Buggy PCA for the 2D dataset: 0.886903
+To choose the knee point, I plot the singular values obtained vs the index and pick \textbf{index = 30} as the knee point. \\
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{../images/2_3_singular_values.png}
+    \caption{Knee point by plotting the singular values}
+    \label{fig:rec_1000d}
+\end{figure}
+
+Then, using this as the knee point , I get the following reconstruction losses
+\begin{verbatim}
+    Buggy reconstruction error dataset1: 401365.6993101793
+    Demeaned reconstruction error dataset1: 136522.97948930142
+    Normalized reconstruction error dataset1: 136814.29049881164
+    DRO reconstruction error dataset1: 136522.97948930142
+\end{verbatim}
 
 
-
+\textbf{Questions: }\\
+\begin{enumerate}
+    \item In buggy PCA, we use the SVD of the data matrix $X$ to get the principal components. However, since the data is not centered, the principal components are not the directions of maximum variance since $XX^T$ is proportional to sample covariance only when the data is centered. Thus, the reconstruction error is high, and the reconstructed points do not represent the original points well.
+    \item This is not surprising since the data is zero meaned we are projecting onto the subspace of maximum variance. Thus, the reconstruction error is low.
+\end{enumerate}
 
 
 
