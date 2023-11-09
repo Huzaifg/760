@@ -179,13 +179,13 @@ if __name__ == "__main__":
 
     # Call all methods on d2
     buggy_representation, buggy_parameters, buggy_reconstruction = buggy_pca(
-        d2, d)
+        d2, d+1)
     demeaned_representation, demeaned_parameters, demeaned_reconstruction = demeaned_pca(
-        d2, d)
+        d2, d+1)
     normalized_representation, normalized_parameters, normalized_reconstruction = normalized_pca(
-        d2, d)
+        d2, d+1)
     dro_representation, dro_parameters_A, dro_parameters_Z, dro_reconstruction, S_diag = DRO(
-        d2, d)
+        d2, d+1)
 
     # Compute the errors
     buggy_reconstruction_error = np.sum((d2 - buggy_reconstruction)**2)
