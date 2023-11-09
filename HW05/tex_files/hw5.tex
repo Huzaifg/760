@@ -491,8 +491,8 @@ $d$--dimensional representation $z_i$.)
         \implies \frac{1}{n} \sum_{i=1}^n \left(-2 y_i^\top z_i\right) &= -2A\\
         \implies A &= \frac{1}{n} \sum_{i=1}^n y_i^\top z_i
     \end{align*}
-    Rearranging and writing this in matrix form, we get $Y = AZ^\top$
-    The rank $d$ approximation of $Y$ is given by $Y = U\Sigma V^\top$. \\
+    Rearranging and writing this in matrix form, we get $Y^\top = AZ^\top$
+    The rank $d$ approximation of $Y$ is given by $Y = U_d\Sigma_d V_d^\top$. \\
     Thus, $Z = U_d$ and $A = \Sigma_dV_d^\top$ where $U_d$ and $V_d$ are the first $d$ columns of $U$ and $V$ respectively will give us the best possible $Z$ and $A$.\\
     In our derivation, we have already assumed that $Z$ has a zero mean and identity covariance and so these constraints are satisfied.\\
 
