@@ -30,7 +30,14 @@
 \usepackage{textcomp}
 \usepackage{caption}
 \usepackage{bbm}
-
+\usepackage{listings}
+\usepackage{xcolor} % Optional, for color highlights
+\lstset{language=Python, 
+        basicstyle=\ttfamily\small, 
+        keywordstyle=\color{blue},
+        commentstyle=\color{green},
+        stringstyle=\color{red},
+        showstringspaces=false}
 
 
 \urlstyle{rm}
@@ -128,8 +135,7 @@
 %%% NOTE:  Replace 'NAME HERE' etc., and delete any "\red{}" wrappers (so it won't show up as red)
 
 \author{
-\red{$>>$NAME HERE$<<$} \\
-\red{$>>$ID HERE$<<$}\\
+\red{$>>$Huzaifa Mustafa Unjhawala$<<$} \\
 } 
 
 \date{}
@@ -185,7 +191,7 @@ Submission Commands:
     \item  python run.py -s vi -d FrozenLake-v0 -e 500 -g 0.9  
     \item python run.py -s vi -d FrozenLake-v0 -e 500 -g 0.75 
 \end{enumerate}
-    
+
 
 \subsubsection*{Examples}
 
@@ -207,6 +213,59 @@ Converges in 3 episodes with reward of -18.64.
 \end{verbatim}
 Achieves a reward of 2.176 after 53 episodes.
 
+\textbf{Answer:}
+This is my code
+\begin{lstlisting}
+    def train_episode(self):
+        # Update the estimated value of each state
+        for each_state in range(self.env.nS):
+            # One step lookahead to find the best action
+            max_summer = -np.infty # Hold the max sum
+            for each_action in range(self.env.nA):
+                summer = 0 # Evalaute the sum for each action
+                for probability, next_state, reward, done in self.env.P[each_state][each_action]:
+                    summer += probability * (reward + self.options.gamma * self.V[next_state])
+                if(summer > max_summer):
+                    max_summer = summer
+        
+            self.V[each_state] = max_summer
+
+        # Dont worry about this part
+        self.statistics[Statistics.Rewards.value] = np.sum(self.V)
+        self.statistics[Statistics.Steps.value] = -1
+\end{lstlisting}
+\begin{lstlisting}
+    def create_greedy_policy(self):
+
+        def policy_fn(state):
+            # Loop over all the actions
+            # Find the action that has the highest expected value given the current state
+            # and return that action (this is the greedy part)
+            best_action = 0
+            max_summer = 0
+            for each_action in range(self.env.nA):
+                summer = 0
+                for probability, next_state, reward, done in self.env.P[state][each_action]:
+                    if done:
+                        best_action = each_action
+                    summer += probability * (reward + self.options.gamma * self.V[next_state])
+                if(summer > max_summer):
+                    max_summer = summer
+                    best_action = each_action
+
+            return best_action
+
+    return policy_fn
+
+\end{lstlisting}
+
+\begin{itemize}
+    \item Episode 3: Reward -14.51
+    \item Episode 3: Reward -16.16
+    \item Episode 38: Reward 0.6374310100676854
+    \item Episode 189: Reward 2.1760922574934574
+    \item Episode 79: Reward 1.1316128486442623
+\end{itemize}
 \section{Q-learning [40 pts]}
 
 The \verb|QLearning| class in \verb|solvers\Q_Learning.py| contains the implementation for the Q-learning algorithm. Complete the \verb|train_episode|, \verb|create_greedy_policy|,  and \verb|make_epsilon_greedy_policy| methods.
@@ -236,7 +295,63 @@ Again for this command, the expected reward is given for a correct solution. If 
 \end{verbatim}
 
 Achieves a best performing policy with -13 reward.
+\textbf{Answer:}
 
+\begin{lstlisting}
+    def train_episode(self):
+        # Reset the environment
+        state = self.env.reset()
+        for t in range(self.options.steps):
+            action_probs = self.epsilon_greedy_action(state) # Get action 
+            using epsilon greedy policy
+            action = np.random.choice(np.arange(len(action_probs)), p=action_probs) 
+            # Choose action epsilon-greedily
+            next_state, reward, done, _ = self.step(action) 
+            # Take a step
+            self.Q[state][action] +=  self.options.alpha * 
+            (reward + self.options.gamma * np.max(self.Q[next_state]) - self.Q[state][action]) 
+            if done: 
+                break
+            state = next_state # Update state
+\end{lstlisting}
+\begin{lstlisting}
+    def create_greedy_policy(self):
+        def policy_fn(state):
+            best_action = np.argmax(self.Q[state])
+            return best_action
+
+        return policy_fn
+\end{lstlisting}
+\begin{lstlisting}
+    def epsilon_greedy_action(self, state):
+        action_probs = np.zeros(self.env.action_space.n)
+        for actionNo in range(self.env.action_space.n):
+            if actionNo == np.argmax(self.Q[state]):
+                action_probs[actionNo] = 1 - self.options.epsilon + self.options.epsilon 
+                / self.env.action_space.n
+            else:
+                action_probs[actionNo] = self.options.epsilon / self.env.action_space.n
+        return action_probs
+\end{lstlisting}
+Plot 1:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../3_1.png}
+    \caption{python run.py -s ql -d CliffWalking -e 100 -a 0.2 -g 0.9 -p 0.1}
+    \label{fig:3_1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../3_2.png}
+    \caption{python run.py -s ql -d CliffWalking -e 100 -a 0.8 -g 0.5 -p 0.1}
+    \label{fig:3_2}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../3_3.png}
+    \caption{python run.py -s ql -d CliffWalking -e 500 -a 0.6 -g 0.8 -p 0.1}
+    \label{fig:3_3}
+\end{figure}
 \section{Q-learning [20 pts]}
 For this question you can either reimplement your Q-learning code or use your previous implementation. You will be using a custom made MDP for analysis. Consider the following Markov Decision Process.
 It has two states $s$. It has two actions $a$: move and stay. The state transition is deterministic: ``move'' moves to the other state, while ``stay' stays at the current state. The reward $r$ is 0 for move,  1 for stay. There is a discounting factor $\gamma=0.8$.
@@ -272,6 +387,14 @@ Let the step size parameter $\alpha=0.5$.
 
 \textbf{Answer:}
 \begin{enumerate}
+    
+    \item First row is A and first column is move.  
+    Q-table after 1 episodes with greedy action:
+    [[0. 0.]
+     [0. 0.]]
+    \item Q-table after 1 episodes with epsilon-greedy action:
+    [[3.98745713 4.9971804 ]
+     [3.99369089 4.99277438]]
     \item Using the Bellman equation, we can calculate the action-value table for the greedy policy as follows:
     \begin{align*}
         Q^*(s, a) = \sum_{s'} P(s' | s, a) \left[ R(s, a, s') + \gamma \max_{a'} Q^*(s', a') \right]
@@ -317,5 +440,99 @@ For submission, plot the final reward/episode for 5 different values of either a
 
 
 \end{enumerate}
+
+\textbf{Answer:}
+Here is my code
+
+
+\begin{lstlisting}
+    def train(self, states, actions, rewards, next_state, done):
+        """
+        Perform single A2C update.
+
+        states: list of states.
+        actions: list of actions taken.
+        rewards: list of rewards received.
+        next_state: next state received after final action.
+        done: if episode ended after last action was taken.
+        """
+
+        states_tensor = torch.tensor(states, dtype=torch.float32)
+
+        # One-hot encoding for actions
+        actions_one_hot = np.zeros([len(actions), self.env.action_space.n])
+        actions_one_hot[np.arange(len(actions)), actions] = 1
+        actions_one_hot = torch.tensor(actions_one_hot, dtype=torch.float32)
+
+        # Compute bootstrapped returns
+        returns = np.zeros_like(rewards)
+        G = 0
+        if not done:
+            G = self.actor_critic.value(torch.tensor(next_state, dtype=torch.float32))
+        for i in reversed(range(len(rewards))):
+            G = rewards[i] + self.options.gamma * G
+            returns[i] = G
+        returns = torch.tensor(returns, dtype=torch.float32)
+
+        # Compute values and advantages
+        values = self.actor_critic.value(states_tensor)
+        advantages = returns - values.detach()
+
+        # Compute log probabilities
+        log_probs = torch.sum(
+            self.actor_critic.log_probs(states_tensor) * actions_one_hot,
+            axis=-1
+        )
+
+        # Compute policy and critic losses
+        policy_loss = -log_probs * advantages
+        critic_loss = torch.square(values - returns)
+
+        # Combine the losses
+        loss = policy_loss.mean() + critic_loss.mean()
+
+        # Perform backpropagation and update the parameters
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+\end{lstlisting}
+
+I tuned the learning rate because the learning looked very unstable. To do this I varied the learning rate from 0.002 down to 0.00075. I found that too high a learning rate causes instability whereas too low a learning rate slows down learning. These are my 5 plots for the 5 different learning rates. I found the best learning rate to be 0.00075.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../lr001_smooth.png}
+    \caption{Learning Rate = 0.001}
+    \label{fig:1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../lr0001_smooth.png}
+    \caption{Learning Rate = 0.0001 - learning is too slow}
+    \label{fig:2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../lr0005_smooth.png}
+    \caption{Learning Rate = 0.0005}
+    \label{fig:3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../lr00075_smooth.png}
+    \caption{Learning Rate = 0.00075 - The best result}
+    \label{fig:4}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../lr002_smooth.png}
+    \caption{Learning Rate = 0.002 - learning is too unstable}
+    \label{fig:5}
+\end{figure}
 
 \end{document}
