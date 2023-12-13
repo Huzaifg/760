@@ -111,36 +111,37 @@ class A2C(AbstractSolver):
         # One-hot encoding for actions
         actions_one_hot = np.zeros([len(actions), self.env.action_space.n])
         actions_one_hot[np.arange(len(actions)), actions] = 1
-        actions_one_hot = torch.tensor(actions_one_hot)
+        actions_one_hot = torch.tensor(actions_one_hot, dtype=torch.float32)
 
-        ################################
-        #   YOUR IMPLEMENTATION HERE   #
-        ################################
-        # Compute returns
+        # Compute bootstrapped returns
         returns = np.zeros_like(rewards)
-        # TODO: Compute bootstrapped returns for each state-action in states
-        # and actions
+        G = 0
+        if not done:
+            G = self.actor_critic.value(torch.tensor(next_state, dtype=torch.float32))
+        for i in reversed(range(len(rewards))):
+            G = rewards[i] + self.options.gamma * G
+            returns[i] = G
         returns = torch.tensor(returns, dtype=torch.float32)
 
+        # Compute values and advantages
         values = self.actor_critic.value(states_tensor)
+        advantages = returns - values.detach()
 
-        # TODO: Compute advantages for each state-action pair in states and
-        # actions.
-
+        # Compute log probabilities
         log_probs = torch.sum(
             self.actor_critic.log_probs(states_tensor) * actions_one_hot,
             axis=-1
         )
 
-        # Compute actor and critic losses
-        ################################
-        #   YOUR IMPLEMENTATION HERE   #
-        ################################
-        # TODO: compute these losses.
-        # Useful functions: torch.square for critic loss.
-        policy_loss = 0.0
-        critic_loss = 0.0
+        # Compute policy and critic losses
+        policy_loss = -log_probs * advantages
+        critic_loss = torch.square(values - returns)
+
+        # Combine the losses
         loss = policy_loss.mean() + critic_loss.mean()
+
+        # Perform backpropagation and update the parameters
+        self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
 
